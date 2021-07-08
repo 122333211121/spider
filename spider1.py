@@ -46,24 +46,23 @@ def get_the_picture():
         if len(IMG_URL) > 0:
             gLock.acquire()
             img_url = IMG_URL.pop()
+            img_name = IMG_NAME.pop()
             gLock.release()
             response = requests.get(img_url)
             # 图片链接中包含了图片格式，使用split函数将其提取出来
             suffix = img_url.split(".")[-1]
             # 去除非法字符
-            suffix.replace('/', '')
+            suffix = suffix.replace('/', '')
             intab = r'\/:*?"<>|'
             outtab = '、、：-？“《》-'
             trantab = str.maketrans(intab, outtab)
-            gLock.acquire()
-            img_name = IMG_NAME.pop()
-            gLock.release()
+            suffix = suffix.translate(trantab)
             # 图片名有些为空，若为空则以数字代替图片名
             if img_name == '':
-                img_path = '{}/{}.{}'.format(file_path, str(i), suffix.translate(trantab))
+                img_path = '{}/{}.{}'.format(file_path, str(i), suffix)
                 i += 1
             else:
-                img_path = '{}/{}.{}'.format(file_path, img_name, suffix.translate(trantab))
+                img_path = '{}/{}.{}'.format(file_path, img_name, suffix)
             if not os.path.exists(img_path):
                 with open(img_path, 'wb')as f:
                     f.write(response.content)
